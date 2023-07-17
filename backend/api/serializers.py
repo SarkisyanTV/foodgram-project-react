@@ -36,8 +36,6 @@ class Hex2NameColor(serializers.Field):
             raise serializers.ValidationError('Для этого цвета нет имени')
         return data
 
-# _____________________________________________________________________________
-
 
 class UsersSerializer(UserSerializer):
     """Создание пользователей."""
@@ -54,7 +52,7 @@ class UsersSerializer(UserSerializer):
             'first_name',
             'last_name',
             'is_subscribed',
-         )
+            )
 
     def get_is_subscribed(self, obj):
         if (self.context.get('request')
@@ -97,10 +95,10 @@ class SubscribeSerializer(serializers.ModelSerializer):
 
     def get_is_subscribed(self, obj):
         return (
-                self.context.get('request').user.is_authenticated
-                and Subscribe.objects.filter(user=self.context['request'].user,
-                                             author=obj).exists()
-        )
+            self.context.get('request').user.is_authenticated
+            and Subscribe.objects.filter(user=self.context['request'].user,
+                                         author=obj).exists()
+            )
 
     def get_recipes_count(self, obj):
         return obj.recipes.count()
@@ -135,7 +133,9 @@ class SubscriptionsSerializer(serializers.ModelSerializer):
         recipes = obj.recipes.all()
         if limit:
             recipes = recipes[:int(limit)]
-        serializer = RecipeSubscribeSerializer(recipes, many=True, read_only=True)
+        serializer = RecipeSubscribeSerializer(
+            recipes, many=True, read_only=True
+        )
         return serializer.data
 
 
@@ -144,8 +144,6 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
     class Meta:
         model = ShoppingCart
         fields = '__all__'
-
-# -----------------------------------------------------------------------------
 
 
 class TagSerializer(serializers.ModelSerializer):

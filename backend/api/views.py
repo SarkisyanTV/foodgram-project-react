@@ -114,7 +114,7 @@ class RecipeViewSet(ModelViewSet):
 
         if request.method == 'POST':
             serializer = RecipeSubscribeSerializer(
-                recipe, data=request.data, context={'request':request}
+                recipe, data=request.data, context={'request': request}
             )
             serializer.is_valid(raise_exception=True)
             if not Favorite.objects.filter(user=user, recipe=recipe).exists():
@@ -170,10 +170,11 @@ class RecipeViewSet(ModelViewSet):
         )
         shopping_list = []
         [shopping_list.append(
-            '* {} - ({}) {}'.format(*ingredient)) for ingredient in ingredients]
-        upload_file = HttpResponse(
+            '* {} - ({}) {}'.format(*ingredient))
+            for ingredient in ingredients]
+        upload = HttpResponse(
             'Cписок покупок:\n' + '\n'.join(shopping_list),
             content_type='text/plain'
-        )
-        upload_file['Content-Disposition'] = f'attachment; filename={UPLOAD_NAME}'
-        return upload_file
+            )
+        upload['Content-Disposition'] = f'attachment; filename={UPLOAD_NAME}'
+        return upload

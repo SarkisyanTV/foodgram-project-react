@@ -1,19 +1,19 @@
-from django.contrib import admin
 import csv
+
 from django.contrib import admin, messages
-from django.contrib.admin import models
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse, path
 
-from .form import CsvImportForm
 from recipes.models import Ingredient
+from .form import CsvImportForm
 from .models import CsvImport
 
 
 @admin.register(CsvImport)
 class CsvImportAdmin(admin.ModelAdmin):
     list_display = ('id', 'csv_file', 'date_added')
+
 
 @admin.register(Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
@@ -46,7 +46,8 @@ class IngredientAdmin(admin.ModelAdmin):
                     if next(rows) != ['name', 'measurement_unit']:
                         # обновляем страницу пользователя
                         # с информацией о какой-то ошибке
-                        messages.warning(request, 'Неверные заголовки у файла')
+                        messages.warning(request,
+                                         'Неверные заголовки у файла')
                         return HttpResponseRedirect(request.path_info)
                     for row in rows:
                         print(row[1])
