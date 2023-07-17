@@ -5,20 +5,37 @@ from .models import (
     Favorite, Subscribe
 )
 
-# Register your models here.
-admin.site.register(
-    Recipe,
-    list_display=(
-        'id', 'name',  'image', 'pub_date', 'author'),
-    filter=('author',)
-    )
-admin.site.register(Tag, list_display=('name', 'color', 'slug'))
-admin.site.register(Favorite, list_display=('recipe', 'user'))
-admin.site.register(
-    RecipeIngredient,
-    list_display=('recipe', 'ingredient', 'amount')
-)
-admin.site.register(ShoppingCart, list_display=('recipe', 'user'))
-admin.site.register(
-    Subscribe, list_display=('user', 'author')
-)
+
+@admin.register(Recipe)
+class RecipeAdmin(admin.ModelAdmin):
+    list_display = ('name', 'author')
+    list_filter = ('author', 'name', 'tags', 'pub_date')
+
+
+@admin.register(Tag)
+class TagAdmin(admin.ModelAdmin):
+    list_display = ('name', 'color', 'slug')
+    list_filter = ('name', 'slug')
+
+
+@admin.register(Favorite)
+class FavoriteAdmin(admin.ModelAdmin):
+    list_display = ('recipe', 'user')
+    list_filter = ('user',)
+
+
+@admin.register(RecipeIngredient)
+class RecipeIngredientAdmin(admin.ModelAdmin):
+    list_display = ('recipe', 'ingredient', 'amount')
+
+
+@admin.register(ShoppingCart)
+class ShoppingCartAdmin(admin.ModelAdmin):
+    list_display = ('recipe', 'user')
+    list_filter = ('user',)
+
+
+@admin.register(Subscribe)
+class SubscribeAdmin(admin.ModelAdmin):
+    list_display = ('user', 'author')
+    list_filter = ('user', 'author')

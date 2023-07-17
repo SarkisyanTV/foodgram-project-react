@@ -5,7 +5,6 @@ User = get_user_model()
 
 admin.site.register(
     User,
-    filter='email',
-    list_display=('email', 'username', 'first_name', 'last_name', 'is_active', 'is_staff'),
-    list_filter=('is_active', 'is_superuser', 'is_staff')
+    list_display=('email', 'username', 'is_active', 'is_staff'),
+    list_filter=('email', 'username', 'is_superuser', 'is_staff')
 )

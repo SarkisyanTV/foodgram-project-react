@@ -19,6 +19,7 @@ class CsvImportAdmin(admin.ModelAdmin):
 class IngredientAdmin(admin.ModelAdmin):
     model = Ingredient
     list_display = ('name', 'measurement_unit')
+    list_filter = ('name', 'measurement_unit')
 
     # даем django(urlpatterns) знать
     # о существовании страницы с формой
