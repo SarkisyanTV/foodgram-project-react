@@ -52,7 +52,7 @@ class UsersSerializer(UserSerializer):
             'first_name',
             'last_name',
             'is_subscribed',
-            )
+        )
 
     def get_is_subscribed(self, obj):
         if (self.context.get('request')
@@ -98,7 +98,7 @@ class SubscribeSerializer(serializers.ModelSerializer):
             self.context.get('request').user.is_authenticated
             and Subscribe.objects.filter(user=self.context['request'].user,
                                          author=obj).exists()
-            )
+        )
 
     def get_recipes_count(self, obj):
         return obj.recipes.count()

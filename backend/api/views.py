@@ -175,6 +175,6 @@ class RecipeViewSet(ModelViewSet):
         upload = HttpResponse(
             'Cписок покупок:\n' + '\n'.join(shopping_list),
             content_type='text/plain'
-            )
+        )
         upload['Content-Disposition'] = f'attachment; filename={UPLOAD_NAME}'
         return upload
