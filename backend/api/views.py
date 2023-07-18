@@ -10,7 +10,7 @@ from rest_framework.permissions import (
     IsAuthenticated, AllowAny
 )
 from rest_framework.response import Response
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from foodgram.settings import UPLOAD_NAME
 from recipes.models import (
@@ -69,10 +69,9 @@ class UsersViewSet(UserViewSet):
                             status=status.HTTP_204_NO_CONTENT)
 
 
-class TagViewSet(ModelViewSet):
+class TagViewSet(ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
-    permission_classes = (AllowAny, )
     pagination_class = None
 
 
