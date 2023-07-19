@@ -61,7 +61,7 @@ jobs:
           username: ${{ secrets.USER }}
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
-          source: "docker-compose.production.yml"
+          source: "infra/docker-compose.production.yml"
           target: "foodgram"
       - name: Executing remote ssh commands to deploy
         uses: appleboy/ssh-action@master
@@ -73,7 +73,7 @@ jobs:
           # Параметр script передаёт в action appleboy/ssh-action команды
           # которые нужно выполнить на сервере..
           script: |
-            cd foodgram
+            cd foodgram/infra
             sudo docker compose -f docker-compose.production.yml pull
             sudo docker compose -f docker-compose.production.yml down
             sudo docker compose -f docker-compose.production.yml up -d
