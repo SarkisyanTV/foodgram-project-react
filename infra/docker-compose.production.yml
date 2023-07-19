@@ -30,7 +30,7 @@ services:
   nginx:
     depends_on:
       - foodgram_db
-    image: stigos/foodgram_nginx
+    image: nginx:1.19.3
     env_file: ../.env
     ports:
       - "80:80"
