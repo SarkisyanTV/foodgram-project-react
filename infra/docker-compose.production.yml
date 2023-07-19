@@ -16,7 +16,7 @@ services:
     restart: always
     depends_on:
       - foodgram_db
-    image: stigos/foodgram_frontend
+    image: stigos/foodgram_backend
     env_file: ../.env
     volumes:
       - media:/app/media
@@ -30,7 +30,7 @@ services:
   nginx:
     depends_on:
       - foodgram_db
-    image: nginx:1.19.3
+    image: stigos/foodgram_nginx
     env_file: ../.env
     ports:
       - "80:80"
