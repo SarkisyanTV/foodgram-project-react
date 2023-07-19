@@ -7,7 +7,7 @@ volumes:
 services:
   foodgram_db:
     image: postgres:13.10-alpine
-    env_file: .env
+    env_file: ../.env
     volumes:
       - pg_data:/var/lib/postgresql/data
     ports:
@@ -17,7 +17,7 @@ services:
     depends_on:
       - foodgram_db
     image: stigos/foodgram_frontend
-    env_file: .env
+    env_file: ../.env
     volumes:
       - media:/app/media
       - static:/static/
@@ -31,7 +31,7 @@ services:
     depends_on:
       - foodgram_db
     image: nginx:1.19.3
-    env_file: .env
+    env_file: ../.env
     ports:
       - "80:80"
     volumes:
