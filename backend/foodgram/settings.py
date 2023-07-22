@@ -12,7 +12,7 @@ SECRET_KEY = os.getenv('DJANGO_KEY', 'secret')
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.0.1', '158.160.9.52']
+ALLOWED_HOSTS = ['localhost', '127.0.0.0.1', '158.160.12.247']
 
 # Application definition
 

@@ -52,7 +52,7 @@ class UsersSerializer(UserSerializer):
             'first_name',
             'last_name',
             'is_subscribed',
-        )
+         )
 
     def get_is_subscribed(self, obj):
         if (self.context.get('request')
@@ -95,9 +95,9 @@ class SubscribeSerializer(serializers.ModelSerializer):
 
     def get_is_subscribed(self, obj):
         return (
-            self.context.get('request').user.is_authenticated
-            and Subscribe.objects.filter(user=self.context['request'].user,
-                                         author=obj).exists()
+                self.context.get('request').user.is_authenticated
+                and Subscribe.objects.filter(user=self.context['request'].user,
+                                             author=obj).exists()
         )
 
     def get_recipes_count(self, obj):
@@ -118,11 +118,9 @@ class SubscriptionsSerializer(serializers.ModelSerializer):
                   'recipes', 'recipes_count')
 
     def get_is_subscribed(self, obj):
-        return (
-            self.context.get('request').user.is_authenticated
-            and Subscribe.objects.filter(user=self.context['request'].user,
+        return (Subscribe.objects.filter(user=self.context['request'].user,
                                          author=obj).exists()
-        )
+                )
 
     def get_recipes_count(self, obj):
         return obj.recipes.count()
@@ -133,9 +131,7 @@ class SubscriptionsSerializer(serializers.ModelSerializer):
         recipes = obj.recipes.all()
         if limit:
             recipes = recipes[:int(limit)]
-        serializer = RecipeSubscribeSerializer(
-            recipes, many=True, read_only=True
-        )
+        serializer = RecipeSubscribeSerializer(recipes, many=True, read_only=True)
         return serializer.data
 
 
@@ -164,15 +160,9 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
     """Список ингредиентов с количеством для рецепта."""
-    id = serializers.ReadOnlyField(source='ingredient.id')
-    name = serializers.ReadOnlyField(source='ingredient.name')
-    measurement_unit = serializers.ReadOnlyField(
-        source='ingredient.measurement_unit'
-    )
-
     class Meta:
         model = RecipeIngredient
-        fields = ('id', 'name', 'measurement_unit', 'amount', )
+        fields = '__all__'
 
 
 class RecipeIngredientCreateSerializer(serializers.ModelSerializer):
@@ -186,12 +176,8 @@ class RecipeIngredientCreateSerializer(serializers.ModelSerializer):
 
 class RecipeSerializer(serializers.ModelSerializer):
     """Получение рецептов при GET запросе."""
-    tags = TagSerializer(many=True)
     image = Base64ImageField()
     author = UsersSerializer()
-    ingredients = RecipeIngredientSerializer(
-        many=True, read_only=True, source='recipes_in'
-    )
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
 
@@ -202,6 +188,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             'author', 'text', 'ingredients', 'pub_date',
             'is_favorited', 'is_in_shopping_cart'
         )
+        depth = 1
         read_only_fields = (
             'pub_date', 'author'
         )
@@ -253,21 +240,21 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     @transaction.atomic
     def create(self, validated_data):
         author = self.context['request'].user
-        tags = validated_data.get('tags')
-        ingredients = validated_data.get('ingredients')
+        tags = validated_data.pop('tags')
+        ingredients = validated_data.pop('ingredients')
         recipe = Recipe.objects.create(author=author, **validated_data)
         self.create_ingredient_in_recipe_set_tags(ingredients, recipe, tags)
         return recipe
 
     @transaction.atomic
     def update(self, instance, validated_data):
-        instance.name = validated_data.get('name', instance.name)
-        instance.text = validated_data.get('text', instance.text)
-        instance.image = validated_data.get('image', instance.image)
-        instance.cooking_time = validated_data.get(
+        instance.image = validated_data.pop('image', instance.image)
+        instance.name = validated_data.pop('name', instance.name)
+        instance.text = validated_data.pop('text', instance.text)
+        instance.cooking_time = validated_data.pop(
             'cooking_time', instance.cooking_time)
-        tags = validated_data.get('tags', instance.tags)
-        ingredients = validated_data.get('ingredients', instance.ingredients)
+        tags = validated_data.pop('tags')
+        ingredients = validated_data.pop('ingredients')
         RecipeIngredient.objects.filter(
             recipe=instance,
             ingredient__in=instance.ingredients.all()).delete()
