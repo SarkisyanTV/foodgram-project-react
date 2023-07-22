@@ -10,6 +10,7 @@ from .models import (
 class RecipeAdmin(admin.ModelAdmin):
     list_display = ('name', 'author')
     list_filter = ('author', 'name', 'tags', 'pub_date')
+    search_fields = ('name',)
 
 
 @admin.register(Tag)
@@ -27,6 +28,7 @@ class FavoriteAdmin(admin.ModelAdmin):
 @admin.register(RecipeIngredient)
 class RecipeIngredientAdmin(admin.ModelAdmin):
     list_display = ('recipe', 'ingredient', 'amount')
+    list_filter = ('recipe',)
 
 
 @admin.register(ShoppingCart)
