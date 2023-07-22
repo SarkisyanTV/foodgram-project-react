@@ -91,7 +91,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           # Параметр script передаёт в action appleboy/ssh-action команды
-          # которые нужно выполнить на сервере...
+          # которые нужно выполнить на сервере..
           script: |
             cd foodgram/infra
             sudo docker compose -f docker-compose.production.yml pull
