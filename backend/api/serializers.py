@@ -8,10 +8,8 @@ from django.shortcuts import get_object_or_404
 from djoser.serializers import UserSerializer
 from rest_framework import serializers
 
-from recipes.models import (
-    Tag, Recipe, RecipeIngredient, Ingredient,
-    Favorite, ShoppingCart, Subscribe
-)
+from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
+                            ShoppingCart, Subscribe, Tag)
 
 User = get_user_model()
 
