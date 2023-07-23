@@ -181,6 +181,7 @@ class RecipeIngredientCreateSerializer(serializers.ModelSerializer):
 
 class RecipeSerializer(serializers.ModelSerializer):
     """Получение рецептов при GET запросе."""
+    tags = TagSerializer(many=True)
     image = Base64ImageField()
     author = UsersSerializer()
     ingredients = RecipeIngredientSerializer(
