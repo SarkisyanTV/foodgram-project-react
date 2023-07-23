@@ -260,7 +260,6 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             )for ingredient in ingredients]
         )
 
-
     @transaction.atomic
     def create(self, validated_data):
         author = self.context['request'].user
