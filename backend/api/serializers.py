@@ -11,6 +11,7 @@ from rest_framework import serializers
 from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
                             ShoppingCart, Tag)
 
+
 User = get_user_model()
 
 
