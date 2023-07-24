@@ -4,8 +4,6 @@ from django.http import HttpResponse
 from django.shortcuts import get_list_or_404, get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
-from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
-                            ShoppingCart, Subscribe, Tag)
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import (AllowAny, IsAuthenticated,
@@ -15,11 +13,13 @@ from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from .filters import IngredientFilter, RecipeFilter
 from .permissions import IsAuthorOrReadOnly
+from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
+                            ShoppingCart, Subscribe, Tag)
 from .serializers import (IngredientSerializer, RecipeCreateSerializer,
                           RecipeIngredientSerializer, RecipeSerializer,
                           RecipeSubscribeSerializer, SubscribeSerializer,
                           SubscriptionsSerializer, TagSerializer,
-                          UsersSerializer)
+                          UsersSerializer, FavoriteSerializer)
 
 User = get_user_model()
 
@@ -50,7 +50,7 @@ class UsersViewSet(UserViewSet):
 
         if request.method == 'POST':
             serializer = SubscribeSerializer(
-                author, data=request.data, context={"request": request})
+                author, data=request.data, context={'request': request})
             serializer.is_valid(raise_exception=True)
             Subscribe.objects.create(user=request.user, author=author)
             return Response(serializer.data,
@@ -104,14 +104,14 @@ class RecipeViewSet(ModelViewSet):
         user = request.user
 
         if request.method == 'POST':
-            serializer = RecipeSubscribeSerializer(
+            serializer = FavoriteSerializer(
                 recipe, data=request.data, context={'request': request}
             )
             serializer.is_valid(raise_exception=True)
-            if not Favorite.objects.filter(user=user, recipe=recipe).exists():
-                Favorite.objects.create(user=user, recipe=recipe)
-                return Response(data=serializer.data)
-            return Response({'error': 'Рецепт уже добавлен в избранном.'})
+            Favorite.objects.create(user=user, recipe=recipe)
+            return Response(
+                data=serializer.data, status=status.HTTP_201_CREATED
+            )
         if request.method == 'DELETE':
             get_object_or_404(Favorite, user=user, recipe=recipe).delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
@@ -125,7 +125,7 @@ class RecipeViewSet(ModelViewSet):
         if request.method == 'POST':
             serializer = RecipeSubscribeSerializer(
                 recipe, data=request.data,
-                context={"request": request}
+                context={'request': request}
             )
             serializer.is_valid(raise_exception=True)
             if not ShoppingCart.objects.filter(
@@ -160,8 +160,7 @@ class RecipeViewSet(ModelViewSet):
         shopping_list = []
         [shopping_list.append(
             '{} - {} {}.'.format(*ingredient)) for ingredient in ingredients]
-        output_file = HttpResponse(
+        return HttpResponse(
             'Cписок покупок:\n' + '\n'.join(shopping_list),
             content_type='text/plain'
         )
-        return output_file

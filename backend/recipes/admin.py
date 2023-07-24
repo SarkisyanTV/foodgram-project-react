@@ -4,11 +4,17 @@ from .models import (Favorite, Recipe, RecipeIngredient, ShoppingCart,
                      Subscribe, Tag)
 
 
+class RecipeIngredientInline(admin.TabularInline):
+    model = RecipeIngredient
+    min_num = 1
+
+
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     list_display = ('name', 'author')
     list_filter = ('author', 'name', 'tags', 'pub_date')
     search_fields = ('name',)
+    inlines = (RecipeIngredientInline,)
 
 
 @admin.register(Tag)

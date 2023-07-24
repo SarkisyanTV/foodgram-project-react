@@ -1,5 +1,8 @@
-from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
+from django.core.validators import (
+    MinValueValidator, RegexValidator, MaxValueValidator
+)
+
 from users.models import User
 
 
@@ -65,7 +68,7 @@ class Recipe(models.Model):
     )
     cooking_time = models.PositiveSmallIntegerField(
         'Время приготовления, мин',
-        validators=[MinValueValidator(1)]
+        validators=(MinValueValidator(1), MaxValueValidator(32000))
     )
     image = models.ImageField(
         'Картинка',
@@ -94,7 +97,7 @@ class Recipe(models.Model):
     )
 
     class Meta:
-        ordering = ['-pub_date']
+        ordering = ('-pub_date',)
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
 
@@ -115,18 +118,13 @@ class RecipeIngredient(models.Model):
         related_name='ingredients_in',
         verbose_name='Ингредиент'
     )
-    amount = models.IntegerField(
+    amount = models.PositiveSmallIntegerField(
         'Количество',
-        validators=[MinValueValidator(1)]
+        validators=(MinValueValidator(1), MaxValueValidator(32000))
     )
 
-    def __str__(self):
-        return (
-            f'{self.recipe.name}: {self.ingredient.name} - {self.amount}'
-            f'{self.ingredient.measurement_unit}'
-        )
-
     class Meta:
+        ordering = ('recipe',)
         verbose_name = 'Ингредиенты в рецепте'
         verbose_name_plural = 'Ингредиенты в рецептах'
         constraints = [
@@ -135,6 +133,12 @@ class RecipeIngredient(models.Model):
                 name='unique_combination'
             )
         ]
+
+    def __str__(self):
+        return (
+            f'{self.recipe.name}: {self.ingredient.name} - {self.amount}'
+            f'{self.ingredient.measurement_unit}'
+        )
 
 
 class Favorite(models.Model):
@@ -152,6 +156,7 @@ class Favorite(models.Model):
     )
 
     class Meta:
+        ordering = ('user',)
         verbose_name = 'Избранное'
         verbose_name_plural = 'Избранное'
         constraints = [
@@ -180,6 +185,7 @@ class ShoppingCart(models.Model):
     )
 
     class Meta:
+        ordering = ('user',)
         verbose_name = 'Покупки'
         verbose_name_plural = 'Покупки'
         constraints = [
@@ -207,10 +213,8 @@ class Subscribe(models.Model):
         verbose_name='Подписан'
     )
 
-    def __str__(self):
-        return f'{self.user.username} - {self.author.username}'
-
     class Meta:
+        ordering = ('user',)
         verbose_name = 'Подписка на авторов'
         verbose_name_plural = 'Подписки на авторов'
         constraints = [
@@ -219,3 +223,6 @@ class Subscribe(models.Model):
                 name='unique_subscribe'
             )
         ]
+
+    def __str__(self):
+        return f'{self.user.username} - {self.author.username}'

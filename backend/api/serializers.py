@@ -6,9 +6,10 @@ from django.core.files.base import ContentFile
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from djoser.serializers import UserSerializer
-from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
-                            ShoppingCart, Subscribe, Tag)
 from rest_framework import serializers
+
+from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
+                            ShoppingCart, Tag)
 
 User = get_user_model()
 
@@ -54,8 +55,9 @@ class UsersSerializer(UserSerializer):
     def get_is_subscribed(self, obj):
         if (self.context.get('request')
                 and not self.context['request'].user.is_anonymous):
-            return Subscribe.objects.filter(user=self.context['request'].user,
-                                            author=obj).exists()
+            return obj.subscribe_author.filter(
+                user=self.context['request'].user,
+                author=obj).exists()
         return False
 
 
@@ -93,8 +95,8 @@ class SubscribeSerializer(serializers.ModelSerializer):
     def get_is_subscribed(self, obj):
         return (
             self.context.get('request').user.is_authenticated
-            and Subscribe.objects.filter(user=self.context['request'].user,
-                                         author=obj).exists()
+            and obj.subscribe_author.filter(user=self.context['request'].user,
+                                            author=obj).exists()
         )
 
     def get_recipes_count(self, obj):
@@ -115,9 +117,10 @@ class SubscriptionsSerializer(serializers.ModelSerializer):
                   'recipes', 'recipes_count')
 
     def get_is_subscribed(self, obj):
-        return (Subscribe.objects.filter(user=self.context['request'].user,
-                                         author=obj).exists()
-                )
+        return (
+            obj.subscribe_author.filter(user=self.context['request'].user,
+                                        author=obj).exists()
+        )
 
     def get_recipes_count(self, obj):
         return obj.recipes.count()
@@ -204,16 +207,15 @@ class RecipeSerializer(serializers.ModelSerializer):
     def get_is_favorited(self, obj):
         return (
             self.context.get('request').user.is_authenticated
-            and Favorite.objects.filter(user=self.context.get('request').user,
-                                        recipe=obj).exists()
+            and obj.favorites_recipes.filter(
+                user=self.context.get('request').user, recipe=obj).exists()
         )
 
     def get_is_in_shopping_cart(self, obj):
         return (
             self.context.get('request').user.is_authenticated
-            and ShoppingCart.objects.filter(
-                user=self.context.get('request').user,
-                recipe=obj).exists()
+            and obj.shopping_recipe.filter(
+                user=self.context.get('request').user, recipe=obj).exists()
         )
 
 
@@ -233,22 +235,6 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             'cooking_time', 'ingredients', 'author'
         )
         read_only_fields = ('author',)
-
-    def validate(self, obj):
-        for field in ['name', 'text', 'cooking_time']:
-            if not obj.get(field):
-                raise serializers.ValidationError(
-                    f'{field} - Обязательное поле.'
-                )
-        if not obj.get('tags'):
-            raise serializers.ValidationError(
-                f'{field} - Обязательное поле.'
-            )
-        if not obj.get('ingredients'):
-            raise serializers.ValidationError(
-                f'{field} - Обязательное поле.'
-            )
-        return obj
 
     @transaction.atomic
     def create_ingredient_in_recipe_set_tags(self, ingredients, recipe, tags):

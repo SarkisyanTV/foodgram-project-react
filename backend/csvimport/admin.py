@@ -29,9 +29,12 @@ class IngredientAdmin(admin.ModelAdmin):
         urls.insert(-1, path('upload-csv/', self.upload_csv))
         return urls
 
-        # если пользователь открыл url 'csv-upload/',
-        # то он выполнит этот метод,
-        # который работает с формой
+    def database_entry(self, obj, **kwargs):
+        Ingredient.objects.bulk_create(
+            [Ingredient(
+                name=row[0], measurement_unit=row[1],
+            ) for row in obj]
+        )
 
     def upload_csv(self, request):
         if request.method == 'POST':
@@ -40,7 +43,6 @@ class IngredientAdmin(admin.ModelAdmin):
             if form.is_valid():
                 # сохраняем загруженный файл и делаем запись в базу
                 form_object = form.save()
-                # обработка csv файла
                 with form_object.csv_file.open('r') as csv_file:
                     rows = csv.reader(csv_file, delimiter=',')
                     if next(rows) != ['name', 'measurement_unit']:
@@ -49,14 +51,7 @@ class IngredientAdmin(admin.ModelAdmin):
                         messages.warning(request,
                                          'Неверные заголовки у файла')
                         return HttpResponseRedirect(request.path_info)
-                    for row in rows:
-                        print(row[1])
-                        # добавляем данные в базу
-                        Ingredient.objects.update_or_create(
-                            name=row[0],
-                            measurement_unit=row[1],
-                        )
-
+                    self.database_entry(rows)
                 # возвращаем пользователя на главную с сообщением об успехе
                 url = reverse('admin:index')
                 messages.success(request, 'Файл успешно импортирован')
