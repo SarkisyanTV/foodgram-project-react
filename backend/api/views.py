@@ -4,8 +4,6 @@ from django.http import HttpResponse
 from django.shortcuts import get_list_or_404, get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
-from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
-                            ShoppingCart, Subscribe, Tag)
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import (AllowAny, IsAuthenticated,
@@ -20,6 +18,9 @@ from .serializers import (FavoriteSerializer, IngredientSerializer,
                           RecipeSerializer, RecipeSubscribeSerializer,
                           SubscribeSerializer, SubscriptionsSerializer,
                           TagSerializer, UsersSerializer)
+from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
+                            ShoppingCart, Subscribe, Tag)
+
 
 User = get_user_model()
 
