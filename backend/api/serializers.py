@@ -177,10 +177,18 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
 class RecipeIngredientCreateSerializer(serializers.ModelSerializer):
     """Ингредиенты для создания рецепта."""
     id = serializers.IntegerField()
+    amount = serializers.IntegerField()
 
     class Meta:
         model = RecipeIngredient
         fields = ('id', 'amount')
+
+    def validate_amount(self, amount):
+        if amount <= 0:
+            raise serializers.ValidationError(
+                'Количество не может быть меньше или равно 0.'
+            )
+        return amount
 
 
 class RecipeSerializer(serializers.ModelSerializer):
@@ -191,6 +199,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     ingredients = RecipeIngredientSerializer(
         many=True, read_only=True, source='recipes_in'
     )
+    cooking_time = serializers.IntegerField()
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
 
