@@ -131,8 +131,8 @@ class RecipeViewSet(ModelViewSet):
             serializer.is_valid(raise_exception=True)
             ShoppingCart.objects.create(user=request.user, recipe=recipe)
             return Response(
-                    serializer.data, status=status.HTTP_201_CREATED
-                )
+                serializer.data, status=status.HTTP_201_CREATED
+            )
         if request.method == 'DELETE':
             get_object_or_404(ShoppingCart, user=request.user,
                               recipe=recipe).delete()
