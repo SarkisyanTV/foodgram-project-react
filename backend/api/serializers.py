@@ -14,6 +14,9 @@ from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
 
 User = get_user_model()
 
+MIN_VALIDATE_VALUE = 1
+MAX_VALIDATE_VALUE = 32000
+
 
 class Base64ImageField(serializers.ImageField):
     def to_internal_value(self, data):
@@ -168,6 +171,9 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
     measurement_unit = serializers.ReadOnlyField(
         source='ingredient.measurement_unit'
     )
+    amount = serializers.IntegerField(
+        min_value=MIN_VALIDATE_VALUE, max_value=MAX_VALIDATE_VALUE
+    )
 
     class Meta:
         model = RecipeIngredient
@@ -177,18 +183,13 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
 class RecipeIngredientCreateSerializer(serializers.ModelSerializer):
     """Ингредиенты для создания рецепта."""
     id = serializers.IntegerField()
-    amount = serializers.IntegerField()
+    amount = serializers.IntegerField(
+        min_value=MIN_VALIDATE_VALUE, max_value=MAX_VALIDATE_VALUE
+    )
 
     class Meta:
         model = RecipeIngredient
         fields = ('id', 'amount')
-
-    def validate_amount(self, amount):
-        if amount <= 0:
-            raise serializers.ValidationError(
-                'Количество не может быть меньше или равно 0.'
-            )
-        return amount
 
 
 class RecipeSerializer(serializers.ModelSerializer):
@@ -199,7 +200,9 @@ class RecipeSerializer(serializers.ModelSerializer):
     ingredients = RecipeIngredientSerializer(
         many=True, read_only=True, source='recipes_in'
     )
-    cooking_time = serializers.IntegerField()
+    cooking_time = serializers.IntegerField(
+        max_value=MIN_VALIDATE_VALUE, min_value=MAX_VALIDATE_VALUE
+    )
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
 
